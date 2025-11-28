@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kode Redeem Manager</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        padding: 50px 20px;
+    }
+    .container {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    select, input, button {
+        padding: 10px;
+        width: 100%;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+    button {
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    #output {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #eee;
+        border-radius: 5px;
+        white-space: pre-line;
+    }
+    .codeItem {
+        padding: 8px;
+        background-color: #d9f9d9;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Kode Redeem Manager</h2>
+    <select id="typeSelect">
+        <option value="7D">7 Day</option>
+        <option value="30D">30 Day</option>
+    </select>
+    <input type="text" id="codeInput" placeholder="Masukkan kode redeem (contoh: S96P-P5FX-5NWV)">
+    <button onclick="addCode()">Tambah Kode</button>
+    
+    <h3>Daftar Kode Redeem:</h3>
+    <div id="codeList"></div>
+
+    <h3>Output:</h3>
+    <div id="output"></div>
+</div>
+
+<script>
+    let codes = JSON.parse(localStorage.getItem('codes')) || [];
+    const codeListDiv = document.getElementById('codeList');
+    const outputDiv = document.getElementById('output');
+
+    function displayCodes() {
+        codeListDiv.innerHTML = '';
+        codes.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'codeItem';
+            div.textContent = item.type + ': ' + item.code;
+            div.onclick = () => redeemCode(index);
+            codeListDiv.appendChild(div);
+        });
+    }
+
+    function addCode() {
+        const type = document.getElementById('typeSelect').value;
+        const code = document.getElementById('codeInput').value.trim();
+        if(code) {
+            codes.push({type: type, code: code});
+            localStorage.setItem('codes', JSON.stringify(codes));
+            document.getElementById('codeInput').value = '';
+            displayCodes();
+        }
+    }
+
+    function redeemCode(index) {
+        const item = codes[index];
+        if(confirm("Ambil kode ini? Kode akan hilang setelah diambil.")) {
+            // tampilkan output sesuai template
+            let duration = item.type === "7D" ? "7 days 🚀" : "30 days 🚀";
+            let price = item.type === "7D" ? "Rp 20.500" : "Rp 61.000";
+            outputDiv.textContent = `🎁 Your Order Has Been Processed!
+Product: VIP - Redeem Code ${item.type} (Redfinger)
+Quantity: 1x
+Total Price: ${price}
+
+🎟️ Redeem Code:
+👉 ${item.code}
+
+How to Redeem:
+1️⃣ Open the Redfinger app
+2️⃣ Log in to your account
+3️⃣ Go to Profile → Prepaid Redemption Code
+4️⃣ Enter the code above
+5️⃣ VIP will be activated automatically for ${duration}
+
+⚠️ Each code can only be used for one account
+💬 No refund unless it’s our mistake.
+
+✨ Thank you for ordering from Arriab Store!`;
+
+            codes.splice(index, 1);
+            localStorage.setItem('codes', JSON.stringify(codes));
+            displayCodes();
+        }
+    }
+
+    displayCodes();
+</script>
+</body>
+</html>
